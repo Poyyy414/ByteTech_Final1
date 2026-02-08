@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const barangayRoutes = require('./routes/barangayRoutes');
 const establishmentRoutes = require('./routes/establishmentRoutes');
 const userRoutes = require('./routes/userRoutes');  
+const sensorRoutes = require('./routes/sensorRoutes');
+const sensorDataRoutes = require('./routes/sensorDataRoutes');  
 
 
 
@@ -20,6 +22,8 @@ app.get('/', function(req, res) {
 app.use('/user', userRoutes);
 app.use('/barangay', barangayRoutes);
 app.use('/establishment', establishmentRoutes);
+app.use('/sensor', sensorRoutes);   
+app.use('/sensor-data', sensorDataRoutes);  
 
 
 
