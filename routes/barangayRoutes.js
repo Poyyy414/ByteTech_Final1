@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const barangayController = require('../controllers/barangayController');
 
-router.get('/', barangayController.getAllBarangays);
-router.get('/:id', barangayController.getBarangayById);
+router.get('/barangay', barangayController.getAllBarangays);
+router.get('/barangay/:id', barangayController.getBarangayById);
 
 module.exports = router;

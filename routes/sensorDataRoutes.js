@@ -4,9 +4,9 @@ const router = express.Router();
 const sensorDataController = require('../controllers/sensorDataController');
 
 // POST sensor data
-router.post('/', sensorDataController.createSensorData);
+router.post('create/sensor-data', sensorDataController.createSensorData);
 
 // GET sensor data
-router.get('/', sensorDataController.getAllSensorData);
+router.get('/sensor-data', sensorDataController.getAllSensorData);
 
 module.exports = router;

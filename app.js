@@ -19,11 +19,11 @@ app.get('/', function(req, res) {
     res.send('Welcome to the ByteTech API!');
 });
 
-app.use('/user', userRoutes);
-app.use('/barangay', barangayRoutes);
-app.use('/establishment', establishmentRoutes);
-app.use('/sensor', sensorRoutes);   
-app.use('/sensor-data', sensorDataRoutes);  
+app.use('/', userRoutes);
+app.use('/', barangayRoutes);
+app.use('/', establishmentRoutes);
+app.use('/', sensorRoutes);   
+app.use('/', sensorDataRoutes);  
 
 
 
