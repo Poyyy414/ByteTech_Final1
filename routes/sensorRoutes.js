@@ -6,7 +6,7 @@ const sensorController = require('../controllers/sensorController');
 router.post('/create/sensor', sensorController.createSensor); //sensor
 
 // Get all sensors (with resolved location)
-router.get('/routes', sensorController.getAllSensors); //sensor
+router.get('/sensor', sensorController.getAllSensors); //sensor
 
 // Get single sensor by ID
 router.get('/sensor/:id', sensorController.getSensorById); //sensor/1
