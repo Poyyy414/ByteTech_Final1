@@ -93,7 +93,7 @@ const getWeeklyPrediction = async (req, res) => {
       }
     }
 
-    // 5️⃣ Save forecasts in weather_foreasts table
+    // 5️ Save forecasts in weather_foreasts table
     try {
       for (const day of forecast) {
         await pool.query(

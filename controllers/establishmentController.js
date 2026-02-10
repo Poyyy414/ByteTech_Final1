@@ -14,7 +14,7 @@ const getAllEstablishments = async (req, res) => {
           e.longitude,
           e.density,
           e.temperature_c,
-          b.name AS barangay_name
+          b.barangay_name AS barangay_name
        FROM establishment e
        JOIN barangay b ON e.barangay_id = b.barangay_id
        ORDER BY e.establishment_id ASC`
