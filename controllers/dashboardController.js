@@ -26,8 +26,8 @@ exports.getDashboardData = async (req, res) => {
                 IFNULL(
                     (
                         1 - (
-                            COUNT(CASE WHEN status = 'PASSED' THEN 1 END) /
-                            NULLIF(COUNT(*), 0)
+                            COUNT(CASE WHEN status = 'PASSED' THEN 1 END) 
+                            / NULLIF(COUNT(*), 0)
                         )
                     ) * 100,
                 0) AS percent
@@ -41,7 +41,7 @@ exports.getDashboardData = async (req, res) => {
             SELECT COUNT(*) AS total FROM users
         `);
 
-        // 🏆 5. Top 5 Barangays by CO2
+        // 🏆 5. Top 5 Barangays by CO2 Emission
         const [topBarangays] = await pool.query(`
             SELECT 
                 b.barangay_name,
@@ -54,11 +54,12 @@ exports.getDashboardData = async (req, res) => {
             LIMIT 5
         `);
 
-        // 📅 6. Monthly CO2 Comparison (Current Year) ✅ FIXED
+        // 📅 6. Monthly CO2 Comparison (STRICT MODE SAFE)
         const [monthlyCO2] = await pool.query(`
             SELECT 
-                DATE_FORMAT(recorded_at, '%b') AS month,
-                SUM(co2_density) AS total
+                MONTH(recorded_at) AS month_number,
+                DATE_FORMAT(MIN(recorded_at), '%b') AS month,
+                IFNULL(SUM(co2_density), 0) AS total
             FROM sensor_data
             WHERE YEAR(recorded_at) = YEAR(CURRENT_DATE())
             GROUP BY YEAR(recorded_at), MONTH(recorded_at)
@@ -66,10 +67,10 @@ exports.getDashboardData = async (req, res) => {
         `);
 
         res.json({
-            heatStressCases: heatStress[0]?.total || 0,
-            totalEmission: emission[0]?.total || 0,
-            inspectionDropPercent: inspection[0]?.percent || 0,
-            totalUsers: users[0]?.total || 0,
+            heatStressCases: heatStress[0].total,
+            totalEmission: emission[0].total,
+            inspectionDropPercent: inspection[0].percent,
+            totalUsers: users[0].total,
             topBarangays,
             monthlyCO2Comparison: monthlyCO2
         });
