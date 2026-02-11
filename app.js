@@ -5,7 +5,8 @@ const barangayRoutes = require('./routes/barangayRoutes');
 const establishmentRoutes = require('./routes/establishmentRoutes');
 const userRoutes = require('./routes/userRoutes');  
 const sensorRoutes = require('./routes/sensorRoutes');
-const sensorDataRoutes = require('./routes/sensorDataRoutes');  
+const sensorDataRoutes = require('./routes/sensorDataRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');  
 
 
 
@@ -24,7 +25,7 @@ app.use('/', barangayRoutes);
 app.use('/', establishmentRoutes);
 app.use('/', sensorRoutes);   
 app.use('/', sensorDataRoutes);  
-
+app.use('/', dashboardRoutes);
 
 
 const PORT = 3000;
