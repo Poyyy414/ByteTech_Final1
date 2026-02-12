@@ -42,10 +42,9 @@ function getCarbonLevel(co2) {
 // ========================
 function calculateHeatIndex(temperature_c, humidity) {
     if (temperature_c === undefined || humidity === undefined) return null;
-    // simple approximation formula
     const T = temperature_c;
     const R = humidity;
-    const HI = 0.5 * (T + 61.0 + ((T-68.0)*1.2) + (R*0.094));
+    const HI = 0.5 * (T + 61.0 + ((T - 68.0) * 1.2) + (R * 0.094));
     return parseFloat(HI.toFixed(2));
 }
 
@@ -53,16 +52,9 @@ function calculateHeatIndex(temperature_c, humidity) {
 // POST: Insert sensor data
 // ========================
 app.post('/create/sensor-data', (req, res) => {
-    const {
-        sensor_id,
-        co2_density,
-        temperature_c,
-        humidity,
-        heat_index_c,
-        carbon_level
-    } = req.body;
+    const { sensor_id, co2_density, temperature_c, humidity, heat_index_c, carbon_level } = req.body;
 
-    if (sensor_id || temperature_c || co2_density) {
+    if (sensor_id === undefined || temperature_c === undefined || co2_density === undefined) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -72,14 +64,7 @@ app.post('/create/sensor-data', (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(sql, [
-        sensor_id,
-        co2_density,
-        temperature_c,
-        humidity,
-        heat_index_c,
-        carbon_level
-    ], (err, result) => {
+    db.query(sql, [sensor_id, co2_density, temperature_c, humidity, heat_index_c, carbon_level], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Database error' });
@@ -96,7 +81,7 @@ app.post('/create/sensor-data', (req, res) => {
 // GET: Latest sensor data for a sensor
 // ========================
 app.get('/sensor-data', (req, res) => {
-    const { sensor_id } = req.params;
+    const { sensor_id } = req.query; // <-- use query parameter
 
     if (!sensor_id) return res.status(400).json({ error: 'sensor_id is required' });
 
@@ -123,5 +108,5 @@ app.get('/sensor-data', (req, res) => {
 // ========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log('Server running on port ${PORT}');
+    console.log(`Server running on port ${PORT}`);
 });
