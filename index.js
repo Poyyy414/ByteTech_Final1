@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 // MySQL connection
 // ========================
 const db = mysql.createConnection({
-    host: 'mmysql-360d30a7-gbox-6009.a.aivencloud.com',
+    host: 'mysql-360d30a7-gbox-6009.a.aivencloud.com',
     user: 'avnadmin',
     password: 'AVNS_xRg_1Ymj9oje4V_wSeq',
     database: 'defaultdb',
