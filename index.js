@@ -62,7 +62,7 @@ app.post('/create/sensor-data', (req, res) => {
         carbon_level
     } = req.body;
 
-    if (!sensor_id || !temperature_c || !co2_density) {
+    if (sensor_id || temperature_c || co2_density) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
