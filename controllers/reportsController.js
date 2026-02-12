@@ -42,7 +42,7 @@ exports.getMonthlyReport = async (req, res) => {
 
         // 5️⃣ Barangay breakdown
         const [breakdownRows] = await pool.query(`
-            SELECT b.name AS barangay_name, SUM(sd.co2_density) AS total
+            SELECT b.barangay_name AS barangay_name, SUM(sd.co2_density) AS total
             FROM sensor_data sd
             JOIN sensor s ON sd.sensor_id = s.sensor_id
             JOIN establishment e ON s.establishment_id = e.establishment_id
@@ -121,7 +121,7 @@ exports.getWeeklyReport = async (req, res) => {
 
         // 5️⃣ Barangay breakdown
         const [breakdownRows] = await pool.query(`
-            SELECT b.name AS barangay_name, SUM(sd.co2_density) AS total
+            SELECT b.barangay_name AS barangay_name, SUM(sd.co2_density) AS total
             FROM sensor_data sd
             JOIN sensor s ON sd.sensor_id = s.sensor_id
             JOIN establishment e ON s.establishment_id = e.establishment_id
