@@ -55,20 +55,16 @@ function calculateHeatIndex(temperature_c, humidity) {
 app.post('/sensor-data', (req, res) => {
     const {
         sensor_id,
-        co2_density = null,
-        temperature_c = null,
-        humidity = null
+        co2_density,
+        temperature_c,
+        humidity,
+        heat_index_c,
+        carbon_level
     } = req.body;
 
-    // Validate required field
-    if (!sensor_id) {
-        return res.status(400).json({ 
-            error: 'Missing required field: sensor_id' 
-        });
+    if (!sensor_id || !temperature_c || !co2_density) {
+        return res.status(400).json({ error: 'Missing required fields' });
     }
-
-    const heat_index_c = calculateHeatIndex(temperature_c, humidity);
-    const carbon_level = getCarbonLevel(co2_density);
 
     const sql = `
         INSERT INTO sensor_data
@@ -76,21 +72,23 @@ app.post('/sensor-data', (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    const values = [
+    db.query(sql, [
         sensor_id,
         co2_density,
         temperature_c,
         humidity,
         heat_index_c,
         carbon_level
-    ];
-
-    db.query(sql, values, (err, result) => {
+    ], (err, result) => {
         if (err) {
-            console.error('DB Insert Error:', err);
-            return res.status(500).json({ error: 'Database error', details: err.message });
+            console.error(err);
+            return res.status(500).json({ error: 'Database error' });
         }
-        res.status(201).json({ success: true, data_id: result.insertId });
+
+        res.status(201).json({
+            success: true,
+            data_id: result.insertId
+        });
     });
 });
 
@@ -125,5 +123,5 @@ app.get('/sensor-data/latest/:sensor_id', (req, res) => {
 // ========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log('Server running on port ${PORT}');
 });
