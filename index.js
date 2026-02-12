@@ -52,7 +52,7 @@ function calculateHeatIndex(temperature_c, humidity) {
 // ========================
 // POST: Insert sensor data
 // ========================
-app.post('/sensor-data', (req, res) => {
+app.post('/create/sensor-data', (req, res) => {
     const {
         sensor_id,
         co2_density,
@@ -95,7 +95,7 @@ app.post('/sensor-data', (req, res) => {
 // ========================
 // GET: Latest sensor data for a sensor
 // ========================
-app.get('/sensor-data/latest/:sensor_id', (req, res) => {
+app.get('/sensor-data', (req, res) => {
     const { sensor_id } = req.params;
 
     if (!sensor_id) return res.status(400).json({ error: 'sensor_id is required' });
