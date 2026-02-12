@@ -2,24 +2,26 @@ const pool = require('../config/database');
 
 /* =====================================================
    📅 MONTHLY REPORT
-   GET /reports/monthly?month=12&year=2026
+   GET /reports/monthly
+   Optional: ?month=12&year=2026
 ===================================================== */
 exports.getMonthlyReport = async (req, res) => {
     try {
-        const { month, year } = req.query;
+        let { month, year } = req.query;
 
-        if (!month || !year) {
-            return res.status(400).json({
-                message: "Month and year are required"
-            });
-        }
+        const now = new Date();
+        month = month || (now.getMonth() + 1);
+        year = year || now.getFullYear();
 
-        // Define date range (BEST PRACTICE - index friendly)
+        month = String(month).padStart(2, '0');
+
         const startDate = `${year}-${month}-01`;
-        const endDateQuery = `
-            SELECT DATE_ADD(?, INTERVAL 1 MONTH) AS endDate
-        `;
-        const [endResult] = await pool.query(endDateQuery, [startDate]);
+
+        const [endResult] = await pool.query(
+            `SELECT DATE_ADD(?, INTERVAL 1 MONTH) AS endDate`,
+            [startDate]
+        );
+
         const endDate = endResult[0].endDate;
 
         // 1️⃣ Current Month Total
@@ -42,13 +44,12 @@ exports.getMonthlyReport = async (req, res) => {
 
         const previousTotal = previous[0].total;
 
-        // 3️⃣ Percent Change
         let percentChange = 0;
         if (previousTotal > 0) {
             percentChange = ((currentTotal - previousTotal) / previousTotal) * 100;
         }
 
-        // 4️⃣ Barangay Breakdown
+        // 3️⃣ Barangay Breakdown
         const [breakdown] = await pool.query(`
             SELECT 
                 b.barangay_name,
@@ -70,13 +71,30 @@ exports.getMonthlyReport = async (req, res) => {
                 : 0
         }));
 
+        // 4️⃣ Raw Sensor Data
+        const [sensorData] = await pool.query(`
+            SELECT 
+                sd.id,
+                sd.sensor_id,
+                sd.co2_density,
+                sd.recorded_at,
+                b.barangay_name
+            FROM sensor_data sd
+            JOIN sensor s ON sd.sensor_id = s.sensor_id
+            JOIN barangay b ON s.barangay_id = b.barangay_id
+            WHERE sd.recorded_at >= ?
+            AND sd.recorded_at < ?
+            ORDER BY sd.recorded_at DESC
+        `, [startDate, endDate]);
+
         res.json({
             type: "Monthly",
             period: `${year}-${month}`,
             totalEmission: currentTotal,
             previousEmission: previousTotal,
             percentChange: Number(percentChange.toFixed(2)),
-            breakdown: formattedBreakdown
+            breakdown: formattedBreakdown,
+            sensorData: sensorData
         });
 
     } catch (error) {
@@ -86,22 +104,25 @@ exports.getMonthlyReport = async (req, res) => {
 };
 
 
-
 /* =====================================================
    📅 WEEKLY REPORT
-   GET /reports/weekly?year=2026&week=50
+   GET /reports/weekly
+   Optional: ?week=50&year=2026
 ===================================================== */
 exports.getWeeklyReport = async (req, res) => {
     try {
-        const { week, year } = req.query;
+        let { week, year } = req.query;
 
-        if (!week || !year) {
-            return res.status(400).json({
-                message: "Week and year are required"
-            });
-        }
+        const now = new Date();
+        year = year || now.getFullYear();
 
-        // Get start & end of selected week
+        // Get current ISO week if not provided
+        const oneJan = new Date(now.getFullYear(), 0, 1);
+        const currentWeek = Math.ceil((((now - oneJan) / 86400000) + oneJan.getDay() + 1) / 7);
+
+        week = week || currentWeek;
+
+        // Get week start and end dates
         const [weekDates] = await pool.query(`
             SELECT 
                 STR_TO_DATE(CONCAT(?, ' ', ?, ' 1'), '%X %V %w') AS startDate,
@@ -131,13 +152,12 @@ exports.getWeeklyReport = async (req, res) => {
 
         const previousTotal = previous[0].total;
 
-        // 3️⃣ Percent Change
         let percentChange = 0;
         if (previousTotal > 0) {
             percentChange = ((currentTotal - previousTotal) / previousTotal) * 100;
         }
 
-        // 4️⃣ Barangay Breakdown
+        // 3️⃣ Barangay Breakdown
         const [breakdown] = await pool.query(`
             SELECT 
                 b.barangay_name,
@@ -159,13 +179,30 @@ exports.getWeeklyReport = async (req, res) => {
                 : 0
         }));
 
+        // 4️⃣ Raw Sensor Data
+        const [sensorData] = await pool.query(`
+            SELECT 
+                sd.id,
+                sd.sensor_id,
+                sd.co2_density,
+                sd.recorded_at,
+                b.barangay_name
+            FROM sensor_data sd
+            JOIN sensor s ON sd.sensor_id = s.sensor_id
+            JOIN barangay b ON s.barangay_id = b.barangay_id
+            WHERE sd.recorded_at >= ?
+            AND sd.recorded_at < ?
+            ORDER BY sd.recorded_at DESC
+        `, [startDate, endDate]);
+
         res.json({
             type: "Weekly",
             period: `Week ${week}, ${year}`,
             totalEmission: currentTotal,
             previousEmission: previousTotal,
             percentChange: Number(percentChange.toFixed(2)),
-            breakdown: formattedBreakdown
+            breakdown: formattedBreakdown,
+            sensorData: sensorData
         });
 
     } catch (error) {
