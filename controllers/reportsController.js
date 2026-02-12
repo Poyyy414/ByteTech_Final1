@@ -74,7 +74,7 @@ exports.getMonthlyReport = async (req, res) => {
         // 4️⃣ Raw Sensor Data
         const [sensorData] = await pool.query(`
             SELECT 
-                sd.data.id,
+                sd.data_id,
                 sd.sensor_id,
                 sd.co2_density,
                 sd.recorded_at,
@@ -182,7 +182,7 @@ exports.getWeeklyReport = async (req, res) => {
         // 4️⃣ Raw Sensor Data
         const [sensorData] = await pool.query(`
             SELECT 
-                sd.id,
+                sd.data_id,
                 sd.sensor_id,
                 sd.co2_density,
                 sd.recorded_at,
