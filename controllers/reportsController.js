@@ -48,7 +48,7 @@ exports.getMonthlyReport = async (req, res) => {
             JOIN establishment e ON s.establishment_id = e.establishment_id
             JOIN barangay b ON e.barangay_id = b.barangay_id
             WHERE sd.recorded_at >= ? AND sd.recorded_at < ?
-            GROUP BY b.name
+            GROUP BY b.barangay_name
         `, [startDate, endDate]);
 
         const breakdown = breakdownRows.map(item => ({
@@ -127,7 +127,7 @@ exports.getWeeklyReport = async (req, res) => {
             JOIN establishment e ON s.establishment_id = e.establishment_id
             JOIN barangay b ON e.barangay_id = b.barangay_id
             WHERE sd.recorded_at >= ? AND sd.recorded_at < ?
-            GROUP BY b.name
+            GROUP BY b.barangay_name
         `, [startDate, endDate]);
 
         const breakdown = breakdownRows.map(item => ({
