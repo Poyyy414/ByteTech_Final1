@@ -39,11 +39,14 @@ app.post('/create/sensor-data', (req, res) => {
         carbon_level
     } = req.body;
 
-  if (
-    typeof sensor_id === 'undefined' ||
-    typeof temperature_c === 'undefined' ||
-    typeof co2_density === 'undefined'
-) {
+        if (
+            sensor_id === undefined ||
+            co2_density === undefined ||
+            temperature_c === undefined ||
+            humidity === undefined ||
+            heat_index_c === undefined ||
+            !carbon_level
+        ) {
     return res.status(400).json({ error: 'Missing required fields' });
 }
 
@@ -105,5 +108,5 @@ app.get('/sensor-data', (req, res) => {
 // ========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log('Server running on port ${PORT}');
-});
+console.log(`Server running on port ${PORT}`); 
+});  
