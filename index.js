@@ -77,36 +77,12 @@ app.post('/create/sensor-data', (req, res) => {
     });
 });
 
-// ========================
-// GET: Latest sensor data for a sensor
-// ========================
-app.get('/sensor-data', (req, res) => {
-    const { sensor_id } = req.params;
-
-    if (!sensor_id) return res.status(400).json({ error: 'sensor_id is required' });
-
-    const sql = `
-        SELECT *
-        FROM sensor_data
-        WHERE sensor_id = ?
-        ORDER BY recorded_at DESC
-        LIMIT 1
-    `;
-
-    db.query(sql, [sensor_id], (err, results) => {
-        if (err) {
-            console.error('DB Query Error:', err);
-            return res.status(500).json({ error: 'Database error', details: err.message });
-        }
-        if (results.length === 0) return res.status(404).json({ message: 'No data found for this sensor' });
-        res.json(results[0]);
-    });
-});
 
 // ========================
 // Start server
 // ========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-console.log(`Server running on port ${PORT}`); 
-});  
+    console.log(`Server running on port ${PORT}`);
+  
+});
