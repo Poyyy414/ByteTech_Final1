@@ -27,29 +27,6 @@ db.connect(err => {
 });
 
 // ========================
-// Helper: Carbon level logic
-// ========================
-function getCarbonLevel(co2) {
-    if (co2 === null || co2 === undefined) return null;
-    if (co2 >= 0.2) return 'VERY HIGH';
-    if (co2 >= 0.15) return 'HIGH';
-    if (co2 >= 0.08) return 'NORMAL';
-    return 'LOW';
-}
-
-// ========================
-// Helper: Heat index calculation
-// ========================
-function calculateHeatIndex(temperature_c, humidity) {
-    if (temperature_c === undefined || humidity === undefined) return null;
-    // simple approximation formula
-    const T = temperature_c;
-    const R = humidity;
-    const HI = 0.5 * (T + 61.0 + ((T-68.0)*1.2) + (R*0.094));
-    return parseFloat(HI.toFixed(2));
-}
-
-// ========================
 // POST: Insert sensor data
 // ========================
 app.post('/create/sensor-data', (req, res) => {
