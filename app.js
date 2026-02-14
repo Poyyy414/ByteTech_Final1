@@ -8,7 +8,7 @@ const sensorRoutes = require('./routes/sensorRoutes');
 const sensorDataRoutes = require('./routes/sensorDataRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');  
 const reportsRoutes = require('./routes/reportsRoutes');
-const aiRoutes = require("./routes/aiRoutes");
+;
 
 
 
@@ -29,7 +29,7 @@ app.use('/', sensorRoutes);
 app.use('/', sensorDataRoutes);  
 app.use('/', dashboardRoutes);
 app.use('/', reportsRoutes);
-app.use('/', aiRoutes);
+
 
 
 const PORT = 3000;
