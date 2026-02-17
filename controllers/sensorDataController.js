@@ -1,3 +1,4 @@
+
 const pool = require('../config/database');
 
 // CREATE sensor data (1 per minute per sensor)
