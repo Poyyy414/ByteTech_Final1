@@ -1,4 +1,3 @@
-
 const pool = require('../config/database');
 
 // CREATE sensor data (1 per minute per sensor)
@@ -18,6 +17,19 @@ exports.createSensorData = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required'
+            });
+        }
+
+        // ✅ Check if sensor_id exists before inserting
+        const [sensorCheck] = await pool.execute(
+            'SELECT sensor_id FROM sensor WHERE sensor_id = ?',
+            [sensor_id]
+        );
+
+        if (sensorCheck.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: `Sensor with ID "${sensor_id}" does not exist. Register the sensor first.`
             });
         }
 
