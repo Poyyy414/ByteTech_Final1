@@ -10,13 +10,6 @@ app.use(bodyParser.json());
 // ========================
 // MySQL connection
 // ========================
-const db = mysql.createConnection({
-    host: 'mysql-c8cdfc5-ariasampoy414-f96b.c.aivencloud.com',
-    user: 'avnadmin',
-    password: 'AVNS_eOmYS1PNHeCkK945wot',
-    database: 'defaultdb',
-    port: 27069
-});
 
 db.connect(err => {
     if (err) {
@@ -83,7 +76,6 @@ app.post('/create/sensor-data', (req, res) => {
 // ========================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    col
+    console.log(`Server running on port ${PORT}`);
   
 });
