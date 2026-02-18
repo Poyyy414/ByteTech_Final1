@@ -10,8 +10,6 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const reportsRoutes = require('./routes/reportsRoutes');
 
 
-
-
 const app = express();
 app.use(bodyParser.json());
 
