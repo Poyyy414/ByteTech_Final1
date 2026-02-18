@@ -1,83 +1,32 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const mysql = require('mysql');
 const cors = require('cors');
+const bodyParser = require('body-parser'); // make sure you install this: npm install body-parser
 
+// Create Express app
 const app = express();
+
+// ========================
+// Middleware
+// ========================
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json()); // or app.use(express.json());
 
 // ========================
-// MySQL connection
+// Routes
 // ========================
-const db = mysql.createConnection({
-    host: 'mysql-c8cdfc5-ariasampoy414-f96b.c.aivencloud.com',
-    user: 'avnadmin',
-    password: 'AVNS_eOmYS1PNHeCkK945wot',
-    database: 'defaultdb',
-    port: 27069
-});
-
-db.connect(err => {
-    if (err) {
-        console.error('DB Connection Error:', err);
-    } else {
-        console.log('MySQL Connected');
-    }
-});
+const sensorDataRoutes = require('./routes/sensorDataRoutes'); // adjust path if needed
+app.use('/', sensorDataRoutes);
 
 // ========================
-// POST: Insert sensor data
+// 404 Fallback
 // ========================
-app.post('/create/sensor-data', (req, res) => {
-    const {
-        sensor_id,
-        co2_density,
-        temperature_c,
-        humidity,
-        heat_index_c,
-        carbon_level,
-        minute_stamp  
-    } = req.body;
-
-    if (
-        sensor_id === undefined ||
-        co2_density === undefined ||
-        temperature_c === undefined ||
-        humidity === undefined ||
-        heat_index_c === undefined ||
-        !carbon_level ||
-        !minute_stamp
-    ) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const sql = `
-        INSERT INTO sensor_data
-        (sensor_id, co2_density, temperature_c, humidity, heat_index_c, carbon_level, minute_stamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-`;
-    db.query(sql, [
-        sensor_id,
-        co2_density,
-        temperature_c,
-        humidity,
-        heat_index_c,
-        carbon_level,
-        minute_stamp
-    ], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Database error' });
-        }
-
-        res.status(201).json({
-            success: true,
-            data_id: result.insertId
-        });
+app.use((req, res) => {
+    res.status(404).json({ 
+        success: false, 
+        message: `Route ${req.method} ${req.url} not found` 
     });
 });
-
 
 // ========================
 // Start server
