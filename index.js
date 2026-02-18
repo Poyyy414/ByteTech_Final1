@@ -9,9 +9,9 @@ app.use(bodyParser.json());
 
 // MySQL connection
 const db = mysql.createConnection({
-    host: 'mysql-32f781d8-gbox-6009.h.aivencloud.com',
+    host: 'mysql-c8cdfc5-ariasampoy414-f96b.c.aivencloud.com',
     user: 'avnadmin',
-    password: 'AVNS_ZqGKBUdWc2m5Ys2X2qr',
+    password: 'AVNS_eOmYS1PNHeCkK945wot',
     database: 'defaultdb'
 });
 
@@ -34,7 +34,7 @@ function getCarbonLevel(co2) {
 
 
 // POST: Insert sensor data
-app.post('/sensor-data', (req, res) => {
+app.post('/create/sensor-data', (req, res) => {
     const {
         sensor_id,
         mq2_analog,
@@ -78,7 +78,7 @@ app.post('/sensor-data', (req, res) => {
 
 
 // GET: Latest sensor data
-app.get('/sensor-data/latest/:sensor_id', (req, res) => {
+app.get('/sensor-data', (req, res) => {
     const { sensor_id } = req.params;
 
     const sql = `
