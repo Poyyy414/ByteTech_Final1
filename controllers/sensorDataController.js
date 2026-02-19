@@ -5,7 +5,6 @@ exports.createSensorData = async (req, res) => {
     try {
         const {
             sensor_id,
-            barangay_id,
             co2_density,
             temperature_c,
             humidity,
@@ -16,7 +15,6 @@ exports.createSensorData = async (req, res) => {
         // Validate required fields
         if (
             sensor_id == null ||
-            barangay_id == null ||
             co2_density == null ||
             temperature_c == null ||
             humidity == null ||
@@ -27,7 +25,7 @@ exports.createSensorData = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: 'All fields are required',
-                required: ['sensor_id', 'barangay_id', 'co2_density', 'temperature_c', 'humidity', 'heat_index_c', 'carbon_level']
+                required: ['sensor_id',  'co2_density', 'temperature_c', 'humidity', 'heat_index_c', 'carbon_level']
             });
         }
 
@@ -66,8 +64,8 @@ exports.createSensorData = async (req, res) => {
 
         const sql = `
             INSERT INTO sensor_data 
-            (sensor_id, barangay_id, co2_density, temperature_c, humidity, heat_index_c, carbon_level, minute_stamp)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            (sensor_id, co2_density, temperature_c, humidity, heat_index_c, carbon_level, minute_stamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
 
         const [result] = await pool.execute(sql, [
