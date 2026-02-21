@@ -3,25 +3,15 @@ const pool = require('../config/database');
 // CREATE feedback
 exports.createFeedback = async (req, res) => {
     try {
-        const { name, feedback_type, rating, message } = req.body;
+        const { feedback_name, category, rating, message } = req.body;
 
-        // Validate required fields
-        if (!feedback_type || !rating || !message) {
+        // Validate required field
+        if (!rating) {
             return res.status(400).json({
                 success: false,
-                message: 'feedback_type, rating, and message are required',
-                required: ['feedback_type', 'rating', 'message'],
-                optional: ['name']
-            });
-        }
-
-        // Validate feedback_type
-        const validTypes = ['Report a Bug', 'Improvement', 'General Feedback', 'Others'];
-        if (!validTypes.includes(feedback_type)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid feedback_type',
-                valid_options: validTypes
+                message: 'Rating is required',
+                required: ['rating'],
+                optional: ['feedback_name', 'category', 'message']
             });
         }
 
@@ -34,30 +24,32 @@ exports.createFeedback = async (req, res) => {
             });
         }
 
-        // Validate message not empty
-        if (message.trim() === '') {
+        // Validate category
+        const validCategories = ['Report a Bug', 'Improvement', 'General Feedback', 'Others'];
+        if (category && !validCategories.includes(category)) {
             return res.status(400).json({
                 success: false,
-                message: 'Message cannot be empty'
+                message: 'Invalid category',
+                valid_options: validCategories
             });
         }
 
         const sql = `
-            INSERT INTO feedback (name, feedback_type, rating, message)
+            INSERT INTO feedback (feedback_name, category, rating, message)
             VALUES (?, ?, ?, ?)
         `;
 
         const [result] = await pool.execute(sql, [
-            name || null,        // optional — null if not provided
-            feedback_type,
+            feedback_name || null,
+            category      || null,
             parsedRating,
-            message.trim()
+            message       || null
         ]);
 
         res.status(201).json({
             success: true,
             message: 'Feedback submitted successfully',
-            feedback_id: result.insertId
+            feeback_id: result.insertId
         });
 
     } catch (error) {
@@ -99,7 +91,7 @@ exports.getFeedbackById = async (req, res) => {
         const { id } = req.params;
 
         const [rows] = await pool.execute(
-            'SELECT * FROM feedback WHERE feedback_id = ?',
+            'SELECT * FROM feedback WHERE feeback_id = ?',
             [id]
         );
 
@@ -125,34 +117,34 @@ exports.getFeedbackById = async (req, res) => {
     }
 };
 
-// GET feedback by type
-exports.getFeedbackByType = async (req, res) => {
+// GET feedback by category
+exports.getFeedbackByCategory = async (req, res) => {
     try {
-        const { type } = req.params;
+        const { category } = req.params;
 
-        const validTypes = ['Report a Bug', 'Improvement', 'General Feedback', 'Others'];
-        if (!validTypes.includes(type)) {
+        const validCategories = ['Report a Bug', 'Improvement', 'General Feedback', 'Others'];
+        if (!validCategories.includes(category)) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid feedback_type',
-                valid_options: validTypes
+                message: 'Invalid category',
+                valid_options: validCategories
             });
         }
 
         const [rows] = await pool.execute(
-            'SELECT * FROM feedback WHERE feedback_type = ? ORDER BY created_at DESC',
-            [type]
+            'SELECT * FROM feedback WHERE category = ? ORDER BY created_at DESC',
+            [category]
         );
 
         res.json({
             success: true,
-            feedback_type: type,
+            category,
             total: rows.length,
             data: rows
         });
 
     } catch (error) {
-        console.error('Get Feedback By Type Error:', error);
+        console.error('Get Feedback By Category Error:', error);
         res.status(500).json({
             success: false,
             message: 'Server error',
@@ -161,22 +153,22 @@ exports.getFeedbackByType = async (req, res) => {
     }
 };
 
-// GET feedback summary (average rating + count per type)
+// GET feedback summary
 exports.getFeedbackSummary = async (req, res) => {
     try {
         const [summary] = await pool.query(`
             SELECT 
-                feedback_type,
-                COUNT(*)            AS total,
-                ROUND(AVG(rating), 1) AS average_rating,
+                category,
+                COUNT(*)               AS total,
+                ROUND(AVG(rating), 1)  AS average_rating,
                 SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END) AS five_star,
                 SUM(CASE WHEN rating = 4 THEN 1 ELSE 0 END) AS four_star,
                 SUM(CASE WHEN rating = 3 THEN 1 ELSE 0 END) AS three_star,
                 SUM(CASE WHEN rating = 2 THEN 1 ELSE 0 END) AS two_star,
                 SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) AS one_star
             FROM feedback
-            GROUP BY feedback_type
-            ORDER BY feedback_type
+            GROUP BY category
+            ORDER BY category
         `);
 
         const [overall] = await pool.query(`
@@ -189,7 +181,7 @@ exports.getFeedbackSummary = async (req, res) => {
         res.json({
             success: true,
             overall: overall[0],
-            by_type: summary
+            by_category: summary
         });
 
     } catch (error) {
@@ -208,7 +200,7 @@ exports.deleteFeedback = async (req, res) => {
         const { id } = req.params;
 
         const [check] = await pool.execute(
-            'SELECT feedback_id FROM feedback WHERE feedback_id = ?',
+            'SELECT feeback_id FROM feedback WHERE feeback_id = ?',
             [id]
         );
 
@@ -219,7 +211,7 @@ exports.deleteFeedback = async (req, res) => {
             });
         }
 
-        await pool.execute('DELETE FROM feedback WHERE feedback_id = ?', [id]);
+        await pool.execute('DELETE FROM feedback WHERE feeback_id = ?', [id]);
 
         res.json({
             success: true,
